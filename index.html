@@ -389,15 +389,15 @@ function Dashboard({ products, demands, contracts, stock: rawStock, crp: rawCRP 
   const gargalos = crpCalc.filter(c => c.capUtil > 100).length;
 
   const cards = [
-    { icon:'📋', val: demands.filter(d=>!['Concluída','Cancelado'].includes(d.status)).length, label:'Demandas em Aberto', color:'blue', delta:'Atualizado agora' },
-    { icon:'⚠️', val: atrasadas, label:'Demandas Atrasadas', color:'red', delta:'Ação urgente necessária' },
-    { icon:'🏗️', val: demands.reduce((a,d)=>a+d.qtd,0), label:'Un. Planejadas Total', color:'blue', delta:'Todas as ordens' },
-    { icon:'✅', val: demands.filter(d=>d.status==='Em Andamento').length, label:'Ordens em Andamento', color:'green', delta:'Produção ativa' },
-    { icon:'🛒', val: 4, label:'Compras Necessárias', color:'orange', delta:'Pendentes no MRP' },
-    { icon:'⚡', val: crpCalc.length ? Math.round(crpCalc.reduce((a,c)=>a+c.capUtil,0)/crpCalc.length)+'%' : '0%', label:'Cap. Média Utilizada', color: crpCalc.some(c=>c.capUtil>100)?'red':'green', delta: gargalos>0 ? `${gargalos} gargalo(s)` : 'Sem sobrecarga' },
-    { icon:'📉', val: criticos, label:'Estoque Crítico', color:'red', delta: criticos>0 ? 'Compra urgente' : 'Tudo normal' },
-    { icon:'📜', val: contracts.filter(c=>c.status==='Ativo').length, label:'Contratos Ativos', color:'blue', delta: contracts.filter(c=>c.status==='Vencendo').length + ' vencendo' },
-    { icon:'🔴', val: gargalos, label:'Gargalos Produtivos', color: gargalos>0?'red':'green', delta: gargalos>0?'Redistribuir carga':'Capacidade OK' },
+    { icon:'', val: demands.filter(d=>!['Concluída','Cancelado'].includes(d.status)).length, label:'Demandas em Aberto', color:'blue', delta:'Atualizado agora' },
+    { icon:'', val: atrasadas, label:'Demandas Atrasadas', color:'red', delta:'Ação urgente necessária' },
+    { icon:'', val: demands.reduce((a,d)=>a+d.qtd,0), label:'Un. Planejadas Total', color:'blue', delta:'Todas as ordens' },
+    { icon:'', val: demands.filter(d=>d.status==='Em Andamento').length, label:'Ordens em Andamento', color:'green', delta:'Produção ativa' },
+    { icon:'', val: 4, label:'Compras Necessárias', color:'orange', delta:'Pendentes no MRP' },
+    { icon:'', val: crpCalc.length ? Math.round(crpCalc.reduce((a,c)=>a+c.capUtil,0)/crpCalc.length)+'%' : '0%', label:'Cap. Média Utilizada', color: crpCalc.some(c=>c.capUtil>100)?'red':'green', delta: gargalos>0 ? `${gargalos} gargalo(s)` : 'Sem sobrecarga' },
+    { icon:'', val: criticos, label:'Estoque Crítico', color:'red', delta: criticos>0 ? 'Compra urgente' : 'Tudo normal' },
+    { icon:'', val: contracts.filter(c=>c.status==='Ativo').length, label:'Contratos Ativos', color:'blue', delta: contracts.filter(c=>c.status==='Vencendo').length + ' vencendo' },
+    { icon:'', val: gargalos, label:'Gargalos Produtivos', color: gargalos>0?'red':'green', delta: gargalos>0?'Redistribuir carga':'Capacidade OK' },
     { icon:'🤖', val: 3, label:'Relatórios IA', color:'blue', delta:'Último: hoje' },
   ];
 
@@ -1740,16 +1740,16 @@ function Configuracoes(){
 // ══════════════════════════════════════════════
 
 const navItems = [
-  {id:'dashboard',icon:'📊',label:'Dashboard',section:'Principal'},
-  {id:'produtos',icon:'📦',label:'Produtos',section:'Produção'},
-  {id:'demandas',icon:'📋',label:'Demandas',section:'Produção'},
-  {id:'bom',icon:'🔧',label:'BOM',section:'Produção'},
-  {id:'pmp',icon:'📅',label:'PMP',section:'Produção'},
-  {id:'mrp',icon:'🔄',label:'MRP',section:'Produção'},
-  {id:'crp',icon:'⚙️',label:'CRP',section:'Produção'},
-  {id:'estoque',icon:'🏭',label:'Estoque',section:'Gestão'},
-  {id:'contratos',icon:'📜',label:'Contratos',section:'Gestão'},
-  {id:'calendario',icon:'🗓️',label:'Calendário',section:'Gestão'},
+  {id:'dashboard',icon:'',label:'Dashboard',section:'Principal'},
+  {id:'produtos',icon:'',label:'Produtos',section:'Produção'},
+  {id:'demandas',icon:'',label:'Demandas',section:'Produção'},
+  {id:'bom',icon:'',label:'BOM',section:'Produção'},
+  {id:'pmp',icon:'',label:'PMP',section:'Produção'},
+  {id:'mrp',icon:'',label:'MRP',section:'Produção'},
+  {id:'crp',icon:'',label:'CRP',section:'Produção'},
+  {id:'estoque',icon:'',label:'Estoque',section:'Gestão'},
+  {id:'contratos',icon:'',label:'Contratos',section:'Gestão'},
+  {id:'calendario',icon:'',label:'Calendário',section:'Gestão'},
   {id:'ia',icon:'🤖',label:'Relatórios IA',section:'Gestão'},
   {id:'config',icon:'⚙️',label:'Configurações',section:'Sistema'},
 ];
