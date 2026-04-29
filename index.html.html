@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>De Olho no Amanhã — ERP PCP</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0B1120;
+  --bg2:#111827;
+  --bg3:#1F2937;
+  --bg4:#374151;
+  --blue:#1E3A8A;
+  --blue-l:#2563EB;
+  --blue-g:#3B82F6;
+  --green:#10B981;
+  --green-d:#059669;
+  --orange:#F59E0B;
+  --red:#EF4444;
+  --white:#F9FAFB;
+  --muted:#9CA3AF;
+  --border:#374151;
+  --font:'Syne',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--white);font-family:var(--font)}
+#root{height:100vh;display:flex;flex-direction:column}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:220px;min-width:220px;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.logo-area{padding:20px 16px 16px;border-bottom:1px solid var(--border)}
+.logo-icon{font-size:24px;margin-bottom:6px}
+.logo-name{font-size:15px;font-weight:800;color:var(--white);letter-spacing:-.3px;line-height:1.2}
+.logo-sub{font-size:10px;color:var(--green);font-weight:600;margin-top:3px;letter-spacing:.8px;text-transform:uppercase}
+.nav{flex:1;overflow-y:auto;padding:8px 0}
+.nav-section{padding:10px 16px 4px;font-size:9px;font-weight:700;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;transition:.15s;border-left:3px solid transparent;font-size:12px;font-weight:500;color:var(--muted);user-select:none}
+.nav-item:hover{background:var(--bg3);color:var(--white)}
+.nav-item.active{background:rgba(37,99,235,.15);color:var(--blue-g);border-left-color:var(--blue-g)}
+.nav-icon{font-size:15px;min-width:18px}
+.sidebar-footer{padding:14px 16px;border-top:1px solid var(--border)}
+.user-name{font-size:12px;font-weight:700;color:var(--white)}
+.user-role{font-size:10px;color:var(--muted);margin-top:1px}
+.online-dot{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:10px;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:12px;height:56px;flex-shrink:0}
+.header-title{font-size:15px;font-weight:700;flex:1}
+.header-badge{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:var(--green);padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.5px}
+.content{flex:1;overflow-y:auto;padding:20px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:.15s;font-family:var(--font);white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--blue-l));color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-secondary{background:var(--bg3);color:var(--white);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--bg4)}
+.btn-green{background:linear-gradient(135deg,var(--green-d),var(--green));color:#fff}
+.btn-green:hover{opacity:.9}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-danger{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CARDS */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:20px}
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px;position:relative;overflow:hidden;transition:.2s}
+.card:hover{border-color:var(--bg4);transform:translateY(-1px)}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.card.blue::before{background:linear-gradient(90deg,var(--blue),var(--blue-g))}
+.card.green::before{background:linear-gradient(90deg,var(--green-d),var(--green))}
+.card.orange::before{background:linear-gradient(90deg,#D97706,var(--orange))}
+.card.red::before{background:linear-gradient(90deg,#DC2626,var(--red))}
+.card-icon{font-size:22px;margin-bottom:8px}
+.card-value{font-size:26px;font-weight:800;color:var(--white);font-family:var(--mono)}
+.card-label{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500;line-height:1.3}
+.card-delta{font-size:10px;margin-top:7px;font-weight:600}
+.delta-up{color:var(--green)}
+.delta-down{color:var(--red)}
+.delta-warn{color:var(--orange)}
+
+/* SECTIONS */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+
+/* TABLES */
+.table-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.table-header{padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);gap:8px;flex-wrap:wrap}
+.table-title{font-size:13px;font-weight:700}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;font-weight:700;color:var(--muted);padding:10px 14px;text-align:left;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--border);background:rgba(17,24,39,.6);white-space:nowrap}
+td{font-size:12px;padding:9px 14px;border-bottom:1px solid rgba(55,65,81,.4);color:#E5E7EB}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.b-green{background:rgba(16,185,129,.12);color:#10B981}
+.b-blue{background:rgba(59,130,246,.12);color:#3B82F6}
+.b-orange{background:rgba(245,158,11,.12);color:#F59E0B}
+.b-red{background:rgba(239,68,68,.12);color:#EF4444}
+.b-gray{background:rgba(156,163,175,.1);color:#9CA3AF}
+.b-purple{background:rgba(139,92,246,.12);color:#A78BFA}
+.b-teal{background:rgba(20,184,166,.12);color:#2DD4BF}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.form-input,.form-select,.form-textarea{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--white);font-family:var(--font);outline:none;transition:.15s;width:100%}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue-g);box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+.form-select option{background:var(--bg3);color:var(--white)}
+.form-textarea{resize:vertical;min-height:80px}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.chart-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px}
+.chart-title{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:14px;text-transform:uppercase;letter-spacing:.5px}
+.bar-chart{display:flex;flex-direction:column;gap:8px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-label{font-size:10px;color:var(--muted);min-width:80px;text-align:right;line-height:1.2}
+.bar-track{flex:1;height:7px;background:var(--bg2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 1s ease}
+.bar-val{font-size:10px;font-family:var(--mono);min-width:32px;color:var(--white)}
+
+/* KANBAN */
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px;min-height:300px}
+.kanban-col{min-width:195px;max-width:195px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.kanban-head{padding:10px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.kanban-count{background:var(--bg);padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600}
+.kanban-body{padding:8px;display:flex;flex-direction:column;gap:6px;flex:1;overflow-y:auto}
+.kanban-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;transition:.15s}
+.kanban-card:hover{border-color:var(--blue-g);transform:translateY(-1px)}
+.kanban-card-title{font-size:11px;font-weight:700;margin-bottom:4px;line-height:1.3}
+.kanban-card-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* GAUGES */
+.gauge-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.gauge-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.gauge-val{font-size:30px;font-weight:800;font-family:var(--mono);line-height:1}
+.gauge-label{font-size:11px;color:var(--muted);margin-top:6px;font-weight:600}
+.gauge-sub{font-size:10px;color:var(--muted);margin-top:2px}
+.gauge-bar{height:6px;background:var(--bg2);border-radius:3px;margin-top:10px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:620px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.5)}
+.modal-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:15px;font-weight:700}
+.modal-body{padding:20px;overflow-y:auto;flex:1}
+.modal-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end}
+
+/* AI BOX */
+.ai-box{background:linear-gradient(135deg,rgba(30,58,138,.25),rgba(16,185,129,.08));border:1px solid rgba(59,130,246,.25);border-radius:12px;padding:16px;margin-bottom:16px}
+.ai-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.ai-icon{font-size:18px}
+.ai-title{font-size:13px;font-weight:700;color:var(--blue-g)}
+.ai-text{font-size:12px;color:#D1D5DB;line-height:1.7}
+
+/* ALERTS */
+.alert{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:10px;font-size:12px;line-height:1.5}
+.alert-orange{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:#FCD34D}
+.alert-red{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#FCA5A5}
+.alert-green{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);color:#6EE7B7}
+
+/* TABS */
+.tabs{display:flex;gap:2px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:16px;width:fit-content}
+.tab{padding:6px 14px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;transition:.15s;color:var(--muted);user-select:none}
+.tab.active{background:var(--bg2);color:var(--white);border:1px solid var(--border)}
+.tab:hover:not(.active){color:var(--white)}
+
+/* ACTION BAR */
+.action-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.search-bar{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--white);font-family:var(--font);outline:none;min-width:200px}
+.search-bar:focus{border-color:var(--blue-g)}
+.search-bar::placeholder{color:var(--muted)}
+
+/* STAT ITEMS */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+.stat-item{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+.stat-val{font-size:20px;font-weight:800;font-family:var(--mono)}
+.stat-lbl{font-size:10px;color:var(--muted);margin-top:2px;font-weight:500}
+
+/* CRP BAR */
+.crp-prog{height:14px;border-radius:6px;position:relative;overflow:hidden;background:var(--bg2);margin-top:4px}
+.crp-fill{height:100%;border-radius:6px;position:absolute;top:0;left:0;transition:width 1.2s ease}
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.cal-nav{display:flex;align-items:center;gap:12px}
+.cal-month{font-size:16px;font-weight:700}
+.cal-days-header{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px}
+.cal-day-name{text-align:center;font-size:10px;font-weight:700;color:var(--muted);padding:4px 0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal-cell{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:5px;min-height:72px;transition:.15s}
+.cal-cell:hover{border-color:var(--bg4)}
+.cal-cell.today{border-color:var(--blue-g)}
+.cal-num{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:3px}
+.cal-cell.today .cal-num{color:var(--blue-g)}
+.cal-cell.other-month .cal-num{opacity:.3}
+.cal-ev{border-left:2px solid;padding:2px 4px;border-radius:0 3px 3px 0;font-size:9px;margin-bottom:2px;line-height:1.3}
+.cal-ev.blue{background:rgba(59,130,246,.15);border-color:var(--blue-g);color:#BFDBFE}
+.cal-ev.green{background:rgba(16,185,129,.15);border-color:var(--green);color:#A7F3D0}
+.cal-ev.orange{background:rgba(245,158,11,.15);border-color:var(--orange);color:#FDE68A}
+.cal-ev.red{background:rgba(239,68,68,.15);border-color:var(--red);color:#FECACA}
+
+/* FORMULA BOX */
+.formula-box{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:11px;margin-bottom:8px;line-height:1.6}
+
+/* AI REPORT TEXT */
+.report-text{white-space:pre-wrap;font-family:var(--font);font-size:12px;line-height:1.8;color:#D1D5DB}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+
+/* COLORS */
+.c-green{color:var(--green)}
+.c-red{color:var(--red)}
+.c-orange{color:var(--orange)}
+.c-blue{color:var(--blue-g)}
+.c-muted{color:var(--muted)}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* TAG */
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:600;background:var(--bg4);color:var(--muted)}
+
+/* BOM TOTAL ROW */
+.total-row td{background:rgba(16,185,129,.06);font-weight:700}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ══════════════════════════════════════════════
+//  DADOS INICIAIS
+// ══════════════════════════════════════════════
+
+const initProducts = [
+  {id:'P001',name:'Motor Elétrico 5cv',type:'Acabado',um:'UN',leadtime:5,loteMin:10,estoqueIni:50,estoqueAtual:38,estoqueSeg:20,custo:1250,tempoPadrao:4.5,status:'Ativo'},
+  {id:'P002',name:'Carcaça Alumínio',type:'Semiacabado',um:'UN',leadtime:3,loteMin:20,estoqueIni:120,estoqueAtual:85,estoqueSeg:40,custo:320,tempoPadrao:2.1,status:'Ativo'},
+  {id:'P003',name:'Bobina Cobre 2mm',type:'Matéria-Prima',um:'KG',leadtime:7,loteMin:100,estoqueIni:500,estoqueAtual:180,estoqueSeg:200,custo:45,tempoPadrao:0,status:'Ativo'},
+  {id:'P004',name:'Rolamento 6205',type:'Matéria-Prima',um:'UN',leadtime:4,loteMin:50,estoqueIni:200,estoqueAtual:310,estoqueSeg:100,custo:28,tempoPadrao:0,status:'Ativo'},
+  {id:'P005',name:'Embalagem Papelão',type:'Embalagem',um:'UN',leadtime:2,loteMin:100,estoqueIni:400,estoqueAtual:95,estoqueSeg:150,custo:8,tempoPadrao:0,status:'Ativo'},
+  {id:'P006',name:'Motor Elétrico 10cv',type:'Acabado',um:'UN',leadtime:7,loteMin:5,estoqueIni:20,estoqueAtual:8,estoqueSeg:15,custo:2800,tempoPadrao:7.0,status:'Ativo'},
+];
+
+const initDemands = [
+  {id:'D001',produto:'Motor Elétrico 5cv',qtd:150,periodo:'Mai/2025',criacao:'2025-03-10',prazo:'2025-05-15',prevAtend:'2025-05-12',tipo:'Pedido Firme',status:'Em Andamento',prioridade:'Alta',contrato:'C001',cliente:'Indústria Alfa SA',responsavel:'João Silva',obs:''},
+  {id:'D002',produto:'Motor Elétrico 10cv',qtd:40,periodo:'Jun/2025',criacao:'2025-03-15',prazo:'2025-06-01',prevAtend:'2025-05-28',tipo:'Pedido Firme',status:'Planejada',prioridade:'Alta',contrato:'C002',cliente:'Beta Equipamentos',responsavel:'Maria Costa',obs:''},
+  {id:'D003',produto:'Motor Elétrico 5cv',qtd:80,periodo:'Jun/2025',criacao:'2025-03-20',prazo:'2025-06-30',prevAtend:'2025-06-25',tipo:'Previsão',status:'Planejada',prioridade:'Média',contrato:'',cliente:'Interno',responsavel:'Carlos Lima',obs:''},
+  {id:'D004',produto:'Motor Elétrico 10cv',qtd:10,periodo:'Abr/2025',criacao:'2025-02-01',prazo:'2025-04-10',prevAtend:'2025-04-20',tipo:'Pedido Firme',status:'Atrasada',prioridade:'Alta',contrato:'C003',cliente:'Gama Industrial',responsavel:'Ana Rocha',obs:'Atraso por falta de componente'},
+  {id:'D005',produto:'Motor Elétrico 5cv',qtd:200,periodo:'Jul/2025',criacao:'2025-04-01',prazo:'2025-07-31',prevAtend:'2025-07-28',tipo:'Previsão',status:'Pausada',prioridade:'Baixa',contrato:'',cliente:'Interno',responsavel:'João Silva',obs:'Aguardando aprovação de orçamento'},
+];
+
+const initContracts = [
+  {id:'C001',numero:'2025-001',tipo:'Cliente',empresa:'Indústria Alfa SA',cnpj:'12.345.678/0001-90',produto:'Motor Elétrico 5cv',valor:187500,inicio:'2025-01-01',venc:'2025-12-31',renovacao:30,responsavel:'João Silva',status:'Ativo',obs:''},
+  {id:'C002',numero:'2025-002',tipo:'Cliente',empresa:'Beta Equipamentos',cnpj:'98.765.432/0001-10',produto:'Motor Elétrico 10cv',valor:112000,inicio:'2025-01-15',venc:'2025-07-15',renovacao:60,responsavel:'Maria Costa',status:'Vencendo',obs:'Renovação em análise'},
+  {id:'C003',numero:'2024-087',tipo:'Cliente',empresa:'Gama Industrial',cnpj:'55.123.456/0001-88',produto:'Motor Elétrico 10cv',valor:56000,inicio:'2024-10-01',venc:'2025-04-01',renovacao:30,responsavel:'Ana Rocha',status:'Vencido',obs:''},
+  {id:'C004',numero:'2025-005',tipo:'Fornecedor',empresa:'Cobre & Cia Ltda',cnpj:'33.444.555/0001-77',produto:'Bobina Cobre 2mm',valor:45000,inicio:'2025-02-01',venc:'2025-12-31',renovacao:30,responsavel:'Carlos Lima',status:'Ativo',obs:''},
+];
+
+const initBOM = [
+  {pai:'Motor Elétrico 5cv',comp:'Carcaça Alumínio',tipo:'Semiacabado',qtd:1,perda:2,leadtime:3,estoqueDisp:85,custo:320},
+  {pai:'Motor Elétrico 5cv',comp:'Bobina Cobre 2mm',tipo:'Matéria-Prima',qtd:3.5,perda:5,leadtime:7,estoqueDisp:180,custo:45},
+  {pai:'Motor Elétrico 5cv',comp:'Rolamento 6205',tipo:'Matéria-Prima',qtd:2,perda:1,leadtime:4,estoqueDisp:310,custo:28},
+  {pai:'Motor Elétrico 5cv',comp:'Embalagem Papelão',tipo:'Embalagem',qtd:1,perda:0,leadtime:2,estoqueDisp:95,custo:8},
+  {pai:'Motor Elétrico 10cv',comp:'Carcaça Alumínio',tipo:'Semiacabado',qtd:1,perda:2,leadtime:3,estoqueDisp:85,custo:320},
+  {pai:'Motor Elétrico 10cv',comp:'Bobina Cobre 2mm',tipo:'Matéria-Prima',qtd:7.0,perda:5,leadtime:7,estoqueDisp:180,custo:45},
+  {pai:'Motor Elétrico 10cv',comp:'Rolamento 6205',tipo:'Matéria-Prima',qtd:2,perda:1,leadtime:4,estoqueDisp:310,custo:28},
+  {pai:'Motor Elétrico 10cv',comp:'Embalagem Papelão',tipo:'Embalagem',qtd:1,perda:0,leadtime:2,estoqueDisp:95,custo:8},
+];
+
+const initPMP = [
+  {id:'PMP001',produto:'Motor Elétrico 5cv',periodo:'Mai/2025',demPrev:100,pedirme:150,estoqueIni:38,estoqueSeg:20,status:'Aprovado'},
+  {id:'PMP002',produto:'Motor Elétrico 10cv',periodo:'Jun/2025',demPrev:20,pedirme:40,estoqueIni:8,estoqueSeg:15,status:'Planejado'},
+  {id:'PMP003',produto:'Motor Elétrico 5cv',periodo:'Jun/2025',demPrev:80,pedirme:0,estoqueIni:26,estoqueSeg:20,status:'Planejado'},
+];
+
+const initCRP = [
+  {id:'CRP001',produto:'Motor Elétrico 5cv',ordem:'OP-2025-001',ct:'Montagem A',maquina:'Mesa Montagem 01',qtdPlan:132,tempoPad:4.5,capDia:480,turno:'2 Turnos',dataIni:'2025-04-28',dataFim:'2025-05-12'},
+  {id:'CRP002',produto:'Motor Elétrico 5cv',ordem:'OP-2025-002',ct:'Bobinamento',maquina:'Bobinadora 01',qtdPlan:132,tempoPad:2.1,capDia:480,turno:'1 Turno',dataIni:'2025-04-25',dataFim:'2025-05-05'},
+  {id:'CRP003',produto:'Motor Elétrico 10cv',ordem:'OP-2025-003',ct:'Montagem A',maquina:'Mesa Montagem 01',qtdPlan:47,tempoPad:7.0,capDia:480,turno:'1 Turno',dataIni:'2025-05-05',dataFim:'2025-05-28'},
+];
+
+const initStock = [
+  {produto:'Motor Elétrico 5cv',tipo:'Acabado',ini:50,entradas:132,saidas:144,seg:20,min:15},
+  {produto:'Motor Elétrico 10cv',tipo:'Acabado',ini:20,entradas:0,saidas:12,seg:15,min:10},
+  {produto:'Carcaça Alumínio',tipo:'Semiacabado',ini:120,entradas:50,saidas:85,seg:40,min:30},
+  {produto:'Bobina Cobre 2mm',tipo:'MP',ini:500,entradas:0,saidas:320,seg:200,min:150},
+  {produto:'Rolamento 6205',tipo:'MP',ini:200,entradas:200,saidas:90,seg:100,min:80},
+  {produto:'Embalagem Papelão',tipo:'Embalagem',ini:400,entradas:0,saidas:305,seg:150,min:100},
+];
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+
+function calcPMP(item){
+  const demTotal = Math.max(item.demPrev, item.pedirme);
+  const qtdProd = Math.max(0, demTotal + item.estoqueSeg - item.estoqueIni);
+  return { ...item, demTotal, necLiq: qtdProd, qtdProd };
+}
+
+function calcMRP(pmpItems, bomItems, stockItems){
+  const rows = [];
+  pmpItems.forEach(p => {
+    const pmpCalc = calcPMP(p);
+    const comps = bomItems.filter(b => b.pai === p.produto);
+    comps.forEach(b => {
+      const necBruta = Math.round(pmpCalc.qtdProd * b.qtd * (1 + b.perda/100));
+      const estoqAtual = stockItems.find(s => s.produto === b.comp)
+        ? stockItems.find(s => s.produto === b.comp).ini + stockItems.find(s => s.produto === b.comp).entradas - stockItems.find(s => s.produto === b.comp).saidas
+        : b.estoqueDisp;
+      const necLiq = Math.max(0, necBruta + b.leadtime*5 - estoqAtual); // proxy for seg stock
+      const acao = necLiq === 0 ? 'Usar Estoque' : b.tipo === 'Matéria-Prima' || b.tipo === 'Embalagem' ? 'Comprar' : 'Produzir';
+      rows.push({
+        pai: p.produto, periodo: p.periodo, qtdPlan: pmpCalc.qtdProd,
+        comp: b.comp, qtdPorUn: b.qtd, perda: b.perda,
+        necBruta, estoqAtual, estoqueSeg: Math.round(b.leadtime*5),
+        necLiq, leadtime: b.leadtime,
+        dataNecess: '2025-04-25', dataCompra: '2025-04-' + (25 - b.leadtime),
+        acao
+      });
+    });
+  });
+  return rows;
+}
+
+function calcCRP(item){
+  const tempoTotal = item.qtdPlan * item.tempoPad;
+  const capUtil = (tempoTotal / item.capDia) * 100;
+  const capOciosa = Math.max(0, item.capDia - tempoTotal);
+  const sobrecarga = Math.max(0, tempoTotal - item.capDia);
+  const status = capUtil > 100 ? 'Sobrecarga' : capUtil > 75 ? 'Atenção' : 'Disponível';
+  return { ...item, tempoTotal: +tempoTotal.toFixed(1), capUtil: +capUtil.toFixed(2), capOciosa: +capOciosa.toFixed(1), sobrecarga: +sobrecarga.toFixed(1), status };
+}
+
+function calcStock(s){ const atual = s.ini + s.entradas - s.saidas; return { ...s, atual, status: atual < s.seg ? 'Crítico' : atual < s.seg * 1.2 ? 'Atenção' : 'Normal' }; }
+
+// ══════════════════════════════════════════════
+//  COMPONENTES BASE
+// ══════════════════════════════════════════════
+
+function StatusBadge({ status }){
+  const map = {
+    'Ativo':'b-green','Planejado':'b-blue','Aprovado':'b-teal','Em Andamento':'b-blue',
+    'Concluído':'b-green','Pausada':'b-orange','Atrasada':'b-red','Cancelado':'b-gray',
+    'Vencendo':'b-orange','Vencido':'b-red','Normal':'b-green','Crítico':'b-red',
+    'Sobrecarga':'b-red','Atenção':'b-orange','Disponível':'b-green','Liberado':'b-purple',
+    'Comprar':'b-orange','Usar Estoque':'b-green','Produzir':'b-blue','Ruptura':'b-red',
+    'Inativo':'b-gray','Liberado':'b-purple','Em Produção':'b-teal',
+  };
+  return <span className={`badge ${map[status]||'b-gray'}`}>{status}</span>;
+}
+
+function MiniBar({ val, max, color='#3B82F6' }){
+  const pct = Math.min(100, Math.round((val/(max||1))*100));
+  return <div className="bar-track"><div className="bar-fill" style={{ width: pct+'%', background: color }}/></div>;
+}
+
+// ══════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════
+
+function Dashboard({ products, demands, contracts, stock: rawStock, crp: rawCRP }){
+  const stock = rawStock.map(calcStock);
+  const crpCalc = rawCRP.map(calcCRP);
+  const atrasadas = demands.filter(d => d.status === 'Atrasada').length;
+  const criticos = stock.filter(s => s.status === 'Crítico').length;
+  const gargalos = crpCalc.filter(c => c.capUtil > 100).length;
+
+  const cards = [
+    { icon:'📋', val: demands.filter(d=>!['Concluída','Cancelado'].includes(d.status)).length, label:'Demandas em Aberto', color:'blue', delta:'Atualizado agora' },
+    { icon:'⚠️', val: atrasadas, label:'Demandas Atrasadas', color:'red', delta:'Ação urgente necessária' },
+    { icon:'🏗️', val: demands.reduce((a,d)=>a+d.qtd,0), label:'Un. Planejadas Total', color:'blue', delta:'Todas as ordens' },
+    { icon:'✅', val: demands.filter(d=>d.status==='Em Andamento').length, label:'Ordens em Andamento', color:'green', delta:'Produção ativa' },
+    { icon:'🛒', val: 4, label:'Compras Necessárias', color:'orange', delta:'Pendentes no MRP' },
+    { icon:'⚡', val: crpCalc.length ? Math.round(crpCalc.reduce((a,c)=>a+c.capUtil,0)/crpCalc.length)+'%' : '0%', label:'Cap. Média Utilizada', color: crpCalc.some(c=>c.capUtil>100)?'red':'green', delta: gargalos>0 ? `${gargalos} gargalo(s)` : 'Sem sobrecarga' },
+    { icon:'📉', val: criticos, label:'Estoque Crítico', color:'red', delta: criticos>0 ? 'Compra urgente' : 'Tudo normal' },
+    { icon:'📜', val: contracts.filter(c=>c.status==='Ativo').length, label:'Contratos Ativos', color:'blue', delta: contracts.filter(c=>c.status==='Vencendo').length + ' vencendo' },
+    { icon:'🔴', val: gargalos, label:'Gargalos Produtivos', color: gargalos>0?'red':'green', delta: gargalos>0?'Redistribuir carga':'Capacidade OK' },
+    { icon:'🤖', val: 3, label:'Relatórios IA', color:'blue', delta:'Último: hoje' },
+  ];
+
+  return (
+    <div>
+      <div className="ai-box">
+        <div className="ai-header"><span className="ai-icon">🤖</span><span className="ai-title">Análise Inteligente — Diagnóstico em Tempo Real</span></div>
+        <div className="ai-text">
+          {atrasadas > 0 && <span>⚠️ <strong>{atrasadas} demanda(s) atrasada(s)</strong> detectada(s). Revisar capacidade e priorizar replanejamento. </span>}
+          {criticos > 0 && <span>🔴 <strong>{criticos} item(ns) com estoque crítico</strong>. Emitir ordens de compra imediatamente. </span>}
+          {gargalos > 0 && <span>⚙️ <strong>{gargalos} centro(s) de trabalho em sobrecarga</strong>. Avaliar turno extra ou redistribuição. </span>}
+          {contracts.filter(c=>c.status==='Vencendo').length > 0 && <span>📜 <strong>{contracts.filter(c=>c.status==='Vencendo').length} contrato(s)</strong> próximo(s) do vencimento. Acionar processo de renovação.</span>}
+        </div>
+      </div>
+      <div className="card-grid">
+        {cards.map((c,i) => (
+          <div key={i} className={`card ${c.color}`}>
+            <div className="card-icon">{c.icon}</div>
+            <div className="card-value">{c.val}</div>
+            <div className="card-label">{c.label}</div>
+            <div className={`card-delta ${c.color==='red'?'delta-down':c.color==='orange'?'delta-warn':'delta-up'}`}>{c.delta}</div>
+          </div>
+        ))}
+      </div>
+      <div className="chart-grid">
+        <div className="chart-box">
+          <div className="chart-title">Estoque Atual vs Segurança</div>
+          <div className="bar-chart">
+            {stock.map((s,i) => (
+              <div key={i} className="bar-row">
+                <span className="bar-label" style={{fontSize:9}}>{s.produto.replace('Motor Elétrico ','Mot. ').substring(0,16)}</span>
+                <MiniBar val={s.atual} max={Math.max(s.atual, s.seg)*1.3} color={s.atual<s.seg?'#EF4444':s.atual<s.seg*1.2?'#F59E0B':'#10B981'}/>
+                <span className="bar-val" style={{color:s.atual<s.seg?'var(--red)':'var(--green)'}}>{s.atual}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="chart-box">
+          <div className="chart-title">Capacidade Utilizada por Centro</div>
+          {crpCalc.map((c,i) => (
+            <div key={i} style={{marginBottom:12}}>
+              <div style={{display:'flex',justifyContent:'space-between',fontSize:11,marginBottom:4}}>
+                <span style={{color:'var(--white)',fontWeight:600}}>{c.ct}</span>
+                <span style={{color:c.capUtil>100?'var(--red)':c.capUtil>75?'var(--orange)':'var(--green)',fontFamily:'var(--mono)',fontWeight:700}}>{c.capUtil.toFixed(1)}%</span>
+              </div>
+              <div className="crp-prog">
+                <div className="crp-fill" style={{width:Math.min(100,c.capUtil)+'%',background:c.capUtil>100?'#EF4444':c.capUtil>75?'#F59E0B':'#10B981'}}/>
+              </div>
+              <div style={{fontSize:10,color:'var(--muted)',marginTop:3}}>{c.maquina} · {c.turno}</div>
+            </div>
+          ))}
+        </div>
+        <div className="chart-box">
+          <div className="chart-title">Demandas por Status</div>
+          {[['Em Andamento','#3B82F6'],['Planejada','#10B981'],['Atrasada','#EF4444'],['Pausada','#F59E0B'],['Concluída','#6EE7B7']].map(([s,c])=>{
+            const n = demands.filter(d=>d.status===s).length;
+            return <div key={s} className="bar-row" style={{marginBottom:8}}>
+              <span className="bar-label">{s}</span>
+              <MiniBar val={n} max={demands.length} color={c}/>
+              <span className="bar-val">{n}</span>
+            </div>
+          })}
+        </div>
+        <div className="chart-box">
+          <div className="chart-title">Contratos por Status</div>
+          {[['Ativo','#10B981'],['Vencendo','#F59E0B'],['Vencido','#EF4444'],['Cancelado','#9CA3AF']].map(([s,c])=>{
+            const n = contracts.filter(d=>d.status===s).length;
+            return <div key={s} className="bar-row" style={{marginBottom:8}}>
+              <span className="bar-label">{s}</span>
+              <MiniBar val={n} max={contracts.length||1} color={c}/>
+              <span className="bar-val">{n}</span>
+            </div>
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  PRODUTOS
+// ══════════════════════════════════════════════
+
+function Produtos({ products, setProducts }){
+  const [search, setSearch] = useState('');
+  const [modal, setModal] = useState(false);
+  const [edit, setEdit] = useState(null);
+  const emptyForm = { id:'', name:'', type:'Acabado', um:'UN', leadtime:'', loteMin:'', estoqueIni:'', estoqueAtual:'', estoqueSeg:'', custo:'', tempoPadrao:'', status:'Ativo' };
+  const [form, setForm] = useState(emptyForm);
+
+  const filtered = products.filter(p =>
+    p.name.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const openNew = () => { setEdit(null); setForm(emptyForm); setModal(true); };
+  const openEdit = p => { setEdit(p); setForm({...p}); setModal(true); };
+  const remove = id => { if(confirm('Excluir produto?')) setProducts(products.filter(p=>p.id!==id)); };
+
+  const save = () => {
+    if(!form.id||!form.name){ alert('Código e Nome obrigatórios.'); return; }
+    const obj = { ...form, leadtime:+form.leadtime, loteMin:+form.loteMin, estoqueIni:+form.estoqueIni, estoqueAtual:+form.estoqueAtual, estoqueSeg:+form.estoqueSeg, custo:+form.custo, tempoPadrao:+form.tempoPadrao };
+    if(edit) setProducts(products.map(p => p.id===edit.id ? obj : p));
+    else setProducts([...products, obj]);
+    setModal(false);
+  };
+
+  return (
+    <div>
+      <div className="action-bar">
+        <input className="search-bar" placeholder="🔍 Buscar por código ou nome..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        <button className="btn btn-primary" onClick={openNew}>＋ Novo Produto</button>
+        <span className="tag">{filtered.length} itens</span>
+      </div>
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Cadastro de Produtos</span></div>
+        <table>
+          <thead><tr><th>Código</th><th>Nome</th><th>Tipo</th><th>UM</th><th>Lead Time</th><th>Lote Mín.</th><th>Est. Atual</th><th>Est. Seg.</th><th>Custo Unit.</th><th>Tempo Pad.</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            {filtered.map(p => (
+              <tr key={p.id}>
+                <td style={{fontFamily:'var(--mono)',color:'var(--blue-g)',fontWeight:600}}>{p.id}</td>
+                <td style={{fontWeight:600}}>{p.name}</td>
+                <td><StatusBadge status={p.type}/></td>
+                <td>{p.um}</td>
+                <td>{p.leadtime}d</td>
+                <td style={{fontFamily:'var(--mono)'}}>{p.loteMin}</td>
+                <td style={{fontFamily:'var(--mono)',fontWeight:700,color:p.estoqueAtual<p.estoqueSeg?'var(--red)':'var(--green)'}}>{p.estoqueAtual}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{p.estoqueSeg}</td>
+                <td style={{fontFamily:'var(--mono)'}}>R$ {p.custo.toLocaleString('pt-BR')}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{p.tempoPadrao}h</td>
+                <td><StatusBadge status={p.status}/></td>
+                <td style={{display:'flex',gap:4}}>
+                  <button className="btn btn-secondary btn-sm" onClick={()=>openEdit(p)}>✏️</button>
+                  <button className="btn btn-danger btn-sm" onClick={()=>remove(p.id)}>🗑️</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <span className="modal-title">{edit?'Editar Produto':'Novo Produto'}</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                {[['Código','id','text'],['Nome','name','text'],['Unidade de Medida','um','text'],['Lead Time (dias)','leadtime','number'],['Lote Mínimo','loteMin','number'],['Estoque Inicial','estoqueIni','number'],['Estoque Atual','estoqueAtual','number'],['Estoque Segurança','estoqueSeg','number'],['Custo Unitário (R$)','custo','number'],['Tempo Padrão (h)','tempoPadrao','number']].map(([l,k,t])=>(
+                  <div key={k} className="form-group">
+                    <label className="form-label">{l}</label>
+                    <input className="form-input" type={t} value={form[k]||''} onChange={e=>setForm({...form,[k]:e.target.value})}/>
+                  </div>
+                ))}
+                <div className="form-group">
+                  <label className="form-label">Tipo</label>
+                  <select className="form-select" value={form.type} onChange={e=>setForm({...form,type:e.target.value})}>
+                    {['Acabado','Semiacabado','Matéria-Prima','Embalagem'].map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Status</label>
+                  <select className="form-select" value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
+                    <option>Ativo</option><option>Inativo</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={save}>💾 Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  DEMANDAS
+// ══════════════════════════════════════════════
+
+function Demandas({ demands, setDemands, contracts, products }){
+  const [view, setView] = useState('lista');
+  const [modal, setModal] = useState(false);
+  const [edit, setEdit] = useState(null);
+  const emptyForm = { id:'', produto:'', qtd:'', periodo:'', criacao:'', prazo:'', prevAtend:'', tipo:'Pedido Firme', status:'Planejada', prioridade:'Média', contrato:'', cliente:'', responsavel:'', obs:'' };
+  const [form, setForm] = useState(emptyForm);
+
+  const statuses = ['Planejada','Em Andamento','Pausada','Concluída','Atrasada'];
+  const statusColors = {'Planejada':'#3B82F6','Em Andamento':'#10B981','Pausada':'#F59E0B','Concluída':'#6EE7B7','Atrasada':'#EF4444'};
+
+  const openNew = () => { setEdit(null); setForm({...emptyForm, id:'D0'+(demands.length+1).toString().padStart(2,'0'), criacao: new Date().toISOString().split('T')[0]}); setModal(true); };
+  const openEdit = d => { setEdit(d); setForm({...d}); setModal(true); };
+
+  const save = () => {
+    if(!form.produto||!form.qtd||!form.prazo){ alert('Produto, Quantidade e Prazo são obrigatórios.'); return; }
+    if(form.status==='Pausada'&&!form.obs){ alert('Informe o motivo da pausa.'); return; }
+    const obj = { ...form, qtd: +form.qtd };
+    if(edit) setDemands(demands.map(d=>d.id===edit.id?obj:d));
+    else setDemands([...demands, obj]);
+    setModal(false);
+  };
+
+  return (
+    <div>
+      <div className="action-bar">
+        <div className="tabs" style={{marginBottom:0}}>
+          <div className={`tab ${view==='lista'?'active':''}`} onClick={()=>setView('lista')}>📋 Lista</div>
+          <div className={`tab ${view==='kanban'?'active':''}`} onClick={()=>setView('kanban')}>📌 Kanban</div>
+        </div>
+        <button className="btn btn-primary" onClick={openNew}>＋ Nova Demanda</button>
+      </div>
+      {view==='lista' ? (
+        <div className="table-wrap">
+          <div className="table-header"><span className="table-title">Demandas ({demands.length})</span></div>
+          <table>
+            <thead><tr><th>ID</th><th>Produto</th><th>Qtd</th><th>Período</th><th>Prazo</th><th>Tipo</th><th>Status</th><th>Prioridade</th><th>Cliente</th><th>Contrato</th><th>Ações</th></tr></thead>
+            <tbody>
+              {demands.map(d=>(
+                <tr key={d.id}>
+                  <td style={{fontFamily:'var(--mono)',color:'var(--blue-g)',fontWeight:600}}>{d.id}</td>
+                  <td style={{fontWeight:600}}>{d.produto}</td>
+                  <td style={{fontFamily:'var(--mono)'}}>{d.qtd}</td>
+                  <td>{d.periodo}</td>
+                  <td style={{color:d.status==='Atrasada'?'var(--red)':'inherit',fontFamily:'var(--mono)'}}>{d.prazo}</td>
+                  <td><span className="badge b-gray">{d.tipo}</span></td>
+                  <td><StatusBadge status={d.status}/></td>
+                  <td><span className={`badge ${d.prioridade==='Alta'?'b-red':d.prioridade==='Média'?'b-orange':'b-gray'}`}>{d.prioridade}</span></td>
+                  <td>{d.cliente}</td>
+                  <td style={{fontFamily:'var(--mono)',color:'var(--blue-g)'}}>{d.contrato||'—'}</td>
+                  <td><button className="btn btn-secondary btn-sm" onClick={()=>openEdit(d)}>✏️</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="kanban">
+          {statuses.map(s=>(
+            <div key={s} className="kanban-col">
+              <div className="kanban-head" style={{color:statusColors[s]}}>
+                <span>{s}</span>
+                <span className="kanban-count">{demands.filter(d=>d.status===s).length}</span>
+              </div>
+              <div className="kanban-body">
+                {demands.filter(d=>d.status===s).map(d=>(
+                  <div key={d.id} className="kanban-card" onClick={()=>openEdit(d)}>
+                    <div className="kanban-card-title">{d.produto}</div>
+                    <div className="kanban-card-sub">{d.id} · {d.qtd} un.</div>
+                    <div className="kanban-card-sub" style={{marginTop:2}}>{d.cliente}</div>
+                    <div className="kanban-card-sub" style={{marginTop:2}}>📅 {d.prazo}</div>
+                    <div style={{marginTop:6}}>
+                      <span className={`badge ${d.prioridade==='Alta'?'b-red':d.prioridade==='Média'?'b-orange':'b-gray'}`}>{d.prioridade}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <span className="modal-title">{edit?'Editar Demanda':'Nova Demanda'}</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-group"><label className="form-label">ID</label><input className="form-input" value={form.id} onChange={e=>setForm({...form,id:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Produto</label>
+                  <select className="form-select" value={form.produto} onChange={e=>setForm({...form,produto:e.target.value})}>
+                    <option value="">Selecione...</option>
+                    {products.map(p=><option key={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Quantidade</label><input className="form-input" type="number" value={form.qtd} onChange={e=>setForm({...form,qtd:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Período</label><input className="form-input" value={form.periodo} onChange={e=>setForm({...form,periodo:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Prazo Entrega</label><input className="form-input" type="date" value={form.prazo} onChange={e=>setForm({...form,prazo:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Data Prev. Atendimento</label><input className="form-input" type="date" value={form.prevAtend} onChange={e=>setForm({...form,prevAtend:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Tipo</label>
+                  <select className="form-select" value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
+                    {['Pedido Firme','Previsão','Interna'].map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Status</label>
+                  <select className="form-select" value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
+                    {['Planejada','Em Andamento','Pausada','Concluída','Atrasada'].map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Prioridade</label>
+                  <select className="form-select" value={form.prioridade} onChange={e=>setForm({...form,prioridade:e.target.value})}>
+                    {['Alta','Média','Baixa'].map(o=><option key={o}>{o}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Contrato Vinculado</label>
+                  <select className="form-select" value={form.contrato} onChange={e=>setForm({...form,contrato:e.target.value})}>
+                    <option value="">Nenhum</option>
+                    {contracts.map(c=><option key={c.id} value={c.id}>{c.id} — {c.empresa}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Cliente</label><input className="form-input" value={form.cliente} onChange={e=>setForm({...form,cliente:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Responsável</label><input className="form-input" value={form.responsavel} onChange={e=>setForm({...form,responsavel:e.target.value})}/></div>
+              </div>
+              {form.status==='Pausada' && (
+                <div className="form-group">
+                  <label className="form-label">⚠️ Motivo da Pausa (obrigatório)</label>
+                  <textarea className="form-textarea" value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})} placeholder="Descreva o motivo da pausa..."/>
+                </div>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={save}>💾 Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  BOM
+// ══════════════════════════════════════════════
+
+function BOM({ bom, setBom }){
+  const pais = [...new Set(bom.map(b=>b.pai))];
+  const [sel, setSel] = useState(pais[0]);
+
+  const [modal, setModal] = useState(false);
+
+  const emptyForm = {
+    comp:'',
+    tipo:'Matéria-Prima',
+    qtd:'',
+    perda:'',
+    leadtime:'',
+    estoqueDisp:'',
+    custo:''
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
+  const items = bom.filter(b=>b.pai===sel);
+
+  const custoTotal = items.reduce(
+    (a,b)=>a+b.custo*b.qtd*(1+b.perda/100),0
+  );
+
+  function addComponent(){
+    if(!form.comp || !form.qtd){
+      alert('Componente e quantidade são obrigatórios');
+      return;
+    }
+
+    const novo = {
+      pai: sel,
+      comp: form.comp,
+      tipo: form.tipo,
+      qtd: +form.qtd,
+      perda: +form.perda,
+      leadtime: +form.leadtime,
+      estoqueDisp: +form.estoqueDisp,
+      custo: +form.custo
+    };
+
+    setBom([...bom, novo]);
+    setForm(emptyForm);
+    setModal(false);
+  }
+
+  return (
+    <div>
+      <div className="action-bar">
+        <select
+          className="form-select"
+          style={{width:260}}
+          value={sel}
+          onChange={e=>setSel(e.target.value)}
+        >
+          {pais.map(p=><option key={p}>{p}</option>)}
+        </select>
+
+        <button
+          className="btn btn-primary"
+          onClick={()=>setModal(true)}
+        >
+          ＋ Adicionar Componente
+        </button>
+      </div>
+
+      <div className="table-wrap">
+        <div className="table-header">
+          <span className="table-title">
+            Estrutura — {sel}
+          </span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Tipo</th>
+              <th>Qtd</th>
+              <th>Perda</th>
+              <th>Lead Time</th>
+              <th>Estoque</th>
+              <th>Custo</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {items.map((b,i)=>(
+              <tr key={i}>
+                <td>{b.comp}</td>
+                <td>{b.tipo}</td>
+                <td>{b.qtd}</td>
+                <td>{b.perda}%</td>
+                <td>{b.leadtime}d</td>
+                <td>{b.estoqueDisp}</td>
+                <td>R$ {b.custo}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MODAL */}
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+
+            <div className="modal-header">
+              <span className="modal-title">
+                Novo Componente
+              </span>
+
+              <button
+                className="btn btn-secondary btn-sm"
+                onClick={()=>setModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-grid">
+
+                <div className="form-group">
+                  <label className="form-label">Componente</label>
+                  <input
+                    className="form-input"
+                    value={form.comp}
+                    onChange={e=>setForm({...form,comp:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Tipo</label>
+                  <select
+                    className="form-select"
+                    value={form.tipo}
+                    onChange={e=>setForm({...form,tipo:e.target.value})}
+                  >
+                    <option>Matéria-Prima</option>
+                    <option>Semiacabado</option>
+                    <option>Embalagem</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Quantidade</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={form.qtd}
+                    onChange={e=>setForm({...form,qtd:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Perda %</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={form.perda}
+                    onChange={e=>setForm({...form,perda:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Lead Time</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={form.leadtime}
+                    onChange={e=>setForm({...form,leadtime:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Estoque</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={form.estoqueDisp}
+                    onChange={e=>setForm({...form,estoqueDisp:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Custo</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={form.custo}
+                    onChange={e=>setForm({...form,custo:e.target.value})}
+                  />
+                </div>
+
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn btn-secondary"
+                onClick={()=>setModal(false)}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn btn-primary"
+                onClick={addComponent}
+              >
+                💾 Salvar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+// ══════════════════════════════════════════════
+//  PMP
+// ══════════════════════════════════════════════
+
+function PMP({ pmp, setPmp }){
+  const [modal, setModal] = useState(false);
+
+  const emptyForm = {
+    id:'',
+    produto:'',
+    periodo:'',
+    demPrev:'',
+    pedirme:'',
+    estoqueIni:'',
+    estoqueSeg:'',
+    status:'Planejado'
+  };
+
+  const [form, setForm] = useState(emptyForm);
+
+  const items = pmp.map(calcPMP);
+
+  function recalcular(){
+    // força re-render aplicando cálculo novamente
+    setPmp([...pmp]);
+  }
+
+  function openNew(){
+    setForm({
+      ...emptyForm,
+      id: 'PMP' + (pmp.length+1).toString().padStart(3,'0')
+    });
+    setModal(true);
+  }
+
+  function salvar(){
+    if(!form.produto || !form.periodo){
+      alert('Produto e período são obrigatórios');
+      return;
+    }
+
+    const novo = {
+      ...form,
+      demPrev: +form.demPrev,
+      pedirme: +form.pedirme,
+      estoqueIni: +form.estoqueIni,
+      estoqueSeg: +form.estoqueSeg
+    };
+
+    setPmp([...pmp, novo]);
+    setModal(false);
+    setForm(emptyForm);
+  }
+
+  return (
+    <div>
+
+      <div className="action-bar">
+        <button className="btn btn-primary" onClick={recalcular}>
+          🔄 Recalcular PMP
+        </button>
+
+        <button className="btn btn-secondary" onClick={openNew}>
+          ＋ Novo Plano
+        </button>
+
+        <button className="btn btn-secondary" onClick={()=>alert('Exportação simulada')}>
+          📄 Exportar
+        </button>
+      </div>
+
+      <div className="table-wrap">
+        <div className="table-header">
+          <span className="table-title">
+            Plano Mestre ({items.length})
+          </span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Produto</th>
+              <th>Período</th>
+              <th>Dem. Prev</th>
+              <th>Ped. Firme</th>
+              <th>Est. Inicial</th>
+              <th>Est. Seg</th>
+              <th>Qtd Produzir</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {items.map(p=>(
+              <tr key={p.id}>
+                <td>{p.id}</td>
+                <td>{p.produto}</td>
+                <td>{p.periodo}</td>
+                <td>{p.demPrev}</td>
+                <td>{p.pedirme}</td>
+                <td>{p.estoqueIni}</td>
+                <td>{p.estoqueSeg}</td>
+                <td style={{color:'var(--green)',fontWeight:700}}>
+                  {p.qtdProd}
+                </td>
+                <td><StatusBadge status={p.status}/></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* MODAL */}
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+
+            <div className="modal-header">
+              <span className="modal-title">Novo Plano PMP</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setModal(false)}>✕</button>
+            </div>
+
+            <div className="modal-body">
+              <div className="form-grid">
+
+                <div className="form-group">
+                  <label className="form-label">Produto</label>
+                  <input className="form-input"
+                    value={form.produto}
+                    onChange={e=>setForm({...form,produto:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Período</label>
+                  <input className="form-input"
+                    value={form.periodo}
+                    onChange={e=>setForm({...form,periodo:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Demanda Prevista</label>
+                  <input type="number" className="form-input"
+                    value={form.demPrev}
+                    onChange={e=>setForm({...form,demPrev:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Pedido Firme</label>
+                  <input type="number" className="form-input"
+                    value={form.pedirme}
+                    onChange={e=>setForm({...form,pedirme:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Estoque Inicial</label>
+                  <input type="number" className="form-input"
+                    value={form.estoqueIni}
+                    onChange={e=>setForm({...form,estoqueIni:e.target.value})}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Estoque Segurança</label>
+                  <input type="number" className="form-input"
+                    value={form.estoqueSeg}
+                    onChange={e=>setForm({...form,estoqueSeg:e.target.value})}
+                  />
+                </div>
+
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(false)}>
+                Cancelar
+              </button>
+
+              <button className="btn btn-primary" onClick={salvar}>
+                💾 Salvar
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  MRP
+// ══════════════════════════════════════════════
+
+function MRP({ pmp, bom, stock }){
+  const [tick, setTick] = React.useState(0);
+  const pmpCalc = pmp.map(calcPMP);
+  const mrp = calcMRP(pmpCalc, bom, stock.map(calcStock));
+  const comprar = mrp.filter(m=>m.acao==='Comprar');
+
+  function exportarListaCompras(){
+    const linhas = comprar.map(m =>
+      `${m.comp}\tQtd Necessária: ${m.necLiq}\tLead Time: ${m.leadtime}d\tData Compra: ${m.dataCompra}\tProduto Pai: ${m.pai}`
+    );
+    const csv = 'Componente\tQtd Necessária\tLead Time\tData Compra\tProduto Pai\n' + linhas.join('\n');
+    const blob = new Blob([csv], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'lista_compras_mrp.txt'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div>
+      <div className="action-bar">
+        <button className="btn btn-primary" onClick={()=>setTick(t=>t+1)}>🔄 Recalcular MRP</button>
+        <button className="btn btn-secondary" onClick={exportarListaCompras} disabled={comprar.length===0}>📄 Exportar Lista de Compras</button>
+      </div>
+      {comprar.length > 0 && (
+        <div className="alert alert-orange">⚠️ <strong>{comprar.length} item(ns) necessitam compra.</strong> Verifique as datas sugeridas e emita as ordens de compra.</div>
+      )}
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Planejamento de Necessidade de Materiais — MRP ({mrp.length} linhas)</span></div>
+        <table>
+          <thead><tr><th>Prod. Pai</th><th>Período</th><th>Qtd PMP</th><th>Componente</th><th>Qtd/Un</th><th>Nec. Bruta</th><th>Est. Atual</th><th>Nec. Líquida</th><th>Lead Time</th><th>Data Necessária</th><th>Data Compra</th><th>Ação</th></tr></thead>
+          <tbody>
+            {mrp.map((m,i)=>(
+              <tr key={i}>
+                <td style={{fontWeight:600,color:'var(--blue-g)'}}>{m.pai}</td>
+                <td>{m.periodo}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{m.qtdPlan}</td>
+                <td style={{fontWeight:600}}>{m.comp}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{m.qtdPorUn}</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--orange)'}}>{m.necBruta}</td>
+                <td style={{fontFamily:'var(--mono)',color:m.estoqAtual<m.estoqueSeg?'var(--red)':'var(--green)'}}>{m.estoqAtual}</td>
+                <td style={{fontFamily:'var(--mono)',fontWeight:700,color:m.necLiq>0?'var(--red)':'var(--green)'}}>{m.necLiq}</td>
+                <td>{m.leadtime}d</td>
+                <td style={{fontFamily:'var(--mono)'}}>{m.dataNecess}</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--orange)'}}>{m.dataCompra}</td>
+                <td><StatusBadge status={m.acao}/></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  CRP
+// ══════════════════════════════════════════════
+
+function CRP({ crp }){
+  const [tick, setTick] = React.useState(0);
+  const items = crp.map(calcCRP);
+  const sobrecargas = items.filter(c=>c.capUtil>100);
+
+  return (
+    <div>
+      <div className="action-bar">
+        <button className="btn btn-primary" onClick={()=>{ setTick(t=>t+1); alert('CRP recalculado com sucesso! ' + items.length + ' ordens processadas.'); }}>🔄 Recalcular CRP</button>
+      </div>
+      {sobrecargas.length > 0 && (
+        <div className="alert alert-red">🔴 <strong>{sobrecargas.length} centro(s) de trabalho em sobrecarga.</strong> {sobrecargas.map(c=>`${c.ct}: ${c.capUtil.toFixed(1)}%`).join(' | ')}. Avaliar turno extra ou redistribuição de carga.</div>
+      )}
+      <div className="gauge-row">
+        {items.map(c=>(
+          <div key={c.id} className="gauge-box">
+            <div className="gauge-val" style={{color:c.capUtil>100?'var(--red)':c.capUtil>75?'var(--orange)':'var(--green)'}}>{c.capUtil.toFixed(1)}%</div>
+            <div className="gauge-label">{c.ct}</div>
+            <div className="gauge-sub">{c.maquina}</div>
+            <div className="gauge-bar">
+              <div className="gauge-fill" style={{width:Math.min(100,c.capUtil)+'%',background:c.capUtil>100?'#EF4444':c.capUtil>75?'#F59E0B':'#10B981'}}/>
+            </div>
+            <div style={{marginTop:10}}><StatusBadge status={c.status}/></div>
+          </div>
+        ))}
+      </div>
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Cálculo de Capacidade por Ordem de Produção</span></div>
+        <table>
+          <thead><tr><th>Ordem</th><th>Produto</th><th>Centro Trab.</th><th>Máquina</th><th>Qtd Plan.</th><th>Tempo Pad.</th><th>Tempo Total</th><th>Cap. Diária</th><th>Cap. Util. %</th><th>Ociosidade</th><th>Sobrecarga</th><th>Turno</th><th>Status</th></tr></thead>
+          <tbody>
+            {items.map(c=>(
+              <tr key={c.id}>
+                <td style={{fontFamily:'var(--mono)',color:'var(--blue-g)',fontWeight:600}}>{c.ordem}</td>
+                <td style={{fontWeight:600}}>{c.produto}</td>
+                <td>{c.ct}</td>
+                <td style={{fontSize:11}}>{c.maquina}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{c.qtdPlan}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{c.tempoPad}h</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--orange)',fontWeight:600}}>{c.tempoTotal}h</td>
+                <td style={{fontFamily:'var(--mono)'}}>{c.capDia}h</td>
+                <td style={{fontFamily:'var(--mono)',fontWeight:700,color:c.capUtil>100?'var(--red)':c.capUtil>75?'var(--orange)':'var(--green)'}}>{c.capUtil.toFixed(2)}%</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--green)'}}>{c.capOciosa > 0 ? c.capOciosa+'h' : '—'}</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--red)',fontWeight:c.sobrecarga>0?700:400}}>{c.sobrecarga > 0 ? c.sobrecarga+'h' : '—'}</td>
+                <td>{c.turno}</td>
+                <td><StatusBadge status={c.status}/></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="chart-box" style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:12,padding:16}}>
+        <div className="chart-title">Fórmulas CRP Aplicadas</div>
+        {items.map(c=>(
+          <div key={c.id} className="formula-box">
+            <span className="c-blue">[{c.ordem}] {c.ct}</span><br/>
+            Tempo Total = {c.qtdPlan} × {c.tempoPad}h = <strong>{c.tempoTotal}h</strong><br/>
+            Cap. Utilizada = {c.tempoTotal}h ÷ {c.capDia}h × 100 = <strong className={c.capUtil>100?'c-red':c.capUtil>75?'c-orange':'c-green'}>{c.capUtil.toFixed(2)}%</strong>
+            {c.sobrecarga > 0 && <><br/><span className="c-red">⚠️ Sobrecarga = {c.tempoTotal}h − {c.capDia}h = {c.sobrecarga}h</span></>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  ESTOQUE
+// ══════════════════════════════════════════════
+
+function Estoque({ stock: rawStock, setStock }){
+  const [stockData, setStockData] = React.useState(rawStock);
+  const stock = stockData.map(calcStock);
+  const criticos = stock.filter(s=>s.status==='Crítico');
+  const [modal, setModal] = React.useState(false);
+  const emptyMov = { produto: rawStock[0]?.produto||'', tipo: 'Entrada', qtd: '', obs: '' };
+  const [form, setForm] = React.useState(emptyMov);
+
+  function registrar(){
+    if(!form.produto||!form.qtd||+form.qtd<=0){ alert('Produto e quantidade são obrigatórios.'); return; }
+    setStockData(prev => prev.map(s => {
+      if(s.produto !== form.produto) return s;
+      if(form.tipo === 'Entrada') return { ...s, entradas: s.entradas + (+form.qtd) };
+      return { ...s, saidas: s.saidas + (+form.qtd) };
+    }));
+    alert(`Movimentação registrada: ${form.tipo} de ${form.qtd} un. em "${form.produto}"`);
+    setForm(emptyMov);
+    setModal(false);
+  }
+
+  function exportar(){
+    const linhas = stock.map(s => `${s.produto}\t${s.tipo}\t${s.ini}\t${s.entradas}\t${s.saidas}\t${s.atual}\t${s.seg}\t${s.min}\t${s.status}`);
+    const csv = 'Produto\tTipo\tEst.Ini\tEntradas\tSaídas\tEst.Atual\tEst.Seg\tEst.Mín\tStatus\n' + linhas.join('\n');
+    const blob = new Blob([csv], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href=url; a.download='estoque.txt'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div>
+      <div className="action-bar">
+        <button className="btn btn-primary" onClick={()=>setModal(true)}>＋ Registrar Movimentação</button>
+        <button className="btn btn-secondary" onClick={exportar}>📄 Exportar</button>
+      </div>
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <span className="modal-title">Registrar Movimentação de Estoque</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-group">
+                  <label className="form-label">Produto</label>
+                  <select className="form-select" value={form.produto} onChange={e=>setForm({...form,produto:e.target.value})}>
+                    {rawStock.map(s=><option key={s.produto}>{s.produto}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Tipo de Movimentação</label>
+                  <select className="form-select" value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
+                    <option>Entrada</option>
+                    <option>Saída</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Quantidade</label>
+                  <input type="number" className="form-input" value={form.qtd} onChange={e=>setForm({...form,qtd:e.target.value})} min="1"/>
+                </div>
+                <div className="form-group" style={{gridColumn:'1/-1'}}>
+                  <label className="form-label">Observação</label>
+                  <input className="form-input" value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})} placeholder="Ex: Recebimento NF 1234, Saída OP-001..."/>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={registrar}>💾 Registrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {criticos.length > 0 && (
+        <div className="alert alert-red">🔴 <strong>Estoque crítico em {criticos.length} item(ns):</strong> {criticos.map(s=>s.produto).join(', ')}. Emitir ordens de compra.</div>
+      )}
+      <div className="stat-row">
+        <div className="stat-item"><div className="stat-val">{stock.length}</div><div className="stat-lbl">Total de Itens</div></div>
+        <div className="stat-item"><div className="stat-val c-green">{stock.filter(s=>s.status==='Normal').length}</div><div className="stat-lbl">Status Normal</div></div>
+        <div className="stat-item"><div className="stat-val c-red">{criticos.length}</div><div className="stat-lbl">Estoque Crítico</div></div>
+        <div className="stat-item"><div className="stat-val c-orange">{stock.filter(s=>s.status==='Atenção').length}</div><div className="stat-lbl">Em Atenção</div></div>
+      </div>
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Controle de Estoque</span></div>
+        <table>
+          <thead><tr><th>Produto</th><th>Tipo</th><th>Est. Inicial</th><th>Entradas</th><th>Saídas</th><th>Est. Atual</th><th>Est. Seg.</th><th>Est. Mín.</th><th>Cobertura</th><th>Status</th></tr></thead>
+          <tbody>
+            {stock.map((s,i)=>(
+              <tr key={i}>
+                <td style={{fontWeight:600}}>{s.produto}</td>
+                <td><span className="badge b-gray">{s.tipo}</span></td>
+                <td style={{fontFamily:'var(--mono)'}}>{s.ini}</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--green)'}}>+{s.entradas}</td>
+                <td style={{fontFamily:'var(--mono)',color:'var(--red)'}}>−{s.saidas}</td>
+                <td style={{fontFamily:'var(--mono)',fontWeight:700,color:s.atual<s.seg?'var(--red)':s.atual<s.seg*1.2?'var(--orange)':'var(--green)'}}>{s.atual}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{s.seg}</td>
+                <td style={{fontFamily:'var(--mono)'}}>{s.min}</td>
+                <td style={{minWidth:100}}><MiniBar val={s.atual} max={Math.max(s.atual,s.seg)*1.4} color={s.atual<s.seg?'#EF4444':s.atual<s.seg*1.2?'#F59E0B':'#10B981'}/></td>
+                <td><StatusBadge status={s.status}/></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  CONTRATOS
+// ══════════════════════════════════════════════
+
+function Contratos({ contracts, setContracts }){
+  const vencendo = contracts.filter(c=>c.status==='Vencendo');
+  const vencidos = contracts.filter(c=>c.status==='Vencido');
+  const [modal, setModal] = React.useState(false);
+  const [edit, setEdit] = React.useState(null);
+
+  const emptyForm = { numero:'', tipo:'Cliente', empresa:'', cnpj:'', produto:'', valor:'', inicio:'', venc:'', renovacao:'30', responsavel:'', status:'Ativo', obs:'' };
+  const [form, setForm] = React.useState(emptyForm);
+
+  function openNew(){ setEdit(null); setForm({...emptyForm, numero: (new Date().getFullYear())+'-'+(contracts.length+1).toString().padStart(3,'0')}); setModal(true); }
+  function openEdit(c){ setEdit(c); setForm({...c, valor: c.valor.toString()}); setModal(true); }
+  function remove(id){ if(confirm('Excluir contrato?')) setContracts(contracts.filter(c=>c.id!==id)); }
+
+  function salvar(){
+    if(!form.empresa||!form.venc){ alert('Empresa e data de vencimento são obrigatórios.'); return; }
+    const obj = { ...form, id: edit ? edit.id : 'C'+(contracts.length+1).toString().padStart(3,'0'), valor: +form.valor, renovacao: +form.renovacao };
+    if(edit) setContracts(contracts.map(c=>c.id===edit.id?obj:c));
+    else setContracts([...contracts, obj]);
+    setModal(false);
+  }
+
+  return (
+    <div>
+      <div className="action-bar">
+        <button className="btn btn-primary" onClick={openNew}>＋ Novo Contrato</button>
+      </div>
+      {vencidos.length > 0 && <div className="alert alert-red">🔴 <strong>{vencidos.length} contrato(s) vencido(s):</strong> {vencidos.map(c=>c.empresa).join(', ')}. Regularizar situação imediatamente.</div>}
+      {vencendo.length > 0 && <div className="alert alert-orange">⚠️ <strong>{vencendo.length} contrato(s) vencendo em breve:</strong> {vencendo.map(c=>c.empresa).join(', ')}. Iniciar processo de renovação.</div>}
+      <div className="stat-row">
+        <div className="stat-item"><div className="stat-val c-green">{contracts.filter(c=>c.status==='Ativo').length}</div><div className="stat-lbl">Ativos</div></div>
+        <div className="stat-item"><div className="stat-val c-orange">{vencendo.length}</div><div className="stat-lbl">Vencendo</div></div>
+        <div className="stat-item"><div className="stat-val c-red">{vencidos.length}</div><div className="stat-lbl">Vencidos</div></div>
+        <div className="stat-item"><div className="stat-val" style={{fontFamily:'var(--mono)'}}>R$ {(contracts.filter(c=>c.status==='Ativo').reduce((a,c)=>a+c.valor,0)/1000).toFixed(0)}k</div><div className="stat-lbl">Valor Total Ativo</div></div>
+      </div>
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Gestão de Contratos ({contracts.length})</span></div>
+        <table>
+          <thead><tr><th>Número</th><th>Tipo</th><th>Empresa</th><th>CNPJ</th><th>Produto/Serviço</th><th>Valor</th><th>Início</th><th>Vencimento</th><th>Renovação</th><th>Responsável</th><th>Status</th><th>Ações</th></tr></thead>
+          <tbody>
+            {contracts.map(c=>(
+              <tr key={c.id}>
+                <td style={{fontFamily:'var(--mono)',color:'var(--blue-g)',fontWeight:600}}>{c.numero}</td>
+                <td><span className="badge b-gray">{c.tipo}</span></td>
+                <td style={{fontWeight:600}}>{c.empresa}</td>
+                <td style={{fontFamily:'var(--mono)',fontSize:11}}>{c.cnpj}</td>
+                <td>{c.produto}</td>
+                <td style={{fontFamily:'var(--mono)'}}>R$ {c.valor.toLocaleString('pt-BR')}</td>
+                <td style={{fontFamily:'var(--mono)',fontSize:11}}>{c.inicio}</td>
+                <td style={{fontFamily:'var(--mono)',fontSize:11,color:c.status==='Vencido'?'var(--red)':c.status==='Vencendo'?'var(--orange)':'inherit'}}>{c.venc}</td>
+                <td>{c.renovacao}d</td>
+                <td>{c.responsavel}</td>
+                <td><StatusBadge status={c.status}/></td>
+                <td style={{display:'flex',gap:4}}>
+                  <button className="btn btn-secondary btn-sm" onClick={()=>openEdit(c)}>✏️</button>
+                  <button className="btn btn-danger btn-sm" onClick={()=>remove(c.id)}>🗑️</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {modal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <span className="modal-title">{edit?'Editar Contrato':'Novo Contrato'}</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setModal(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-grid">
+                <div className="form-group"><label className="form-label">Número</label><input className="form-input" value={form.numero} onChange={e=>setForm({...form,numero:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Tipo</label>
+                  <select className="form-select" value={form.tipo} onChange={e=>setForm({...form,tipo:e.target.value})}>
+                    <option>Cliente</option><option>Fornecedor</option><option>Parceiro</option>
+                  </select>
+                </div>
+                <div className="form-group"><label className="form-label">Empresa</label><input className="form-input" value={form.empresa} onChange={e=>setForm({...form,empresa:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">CNPJ</label><input className="form-input" value={form.cnpj} onChange={e=>setForm({...form,cnpj:e.target.value})} placeholder="00.000.000/0001-00"/></div>
+                <div className="form-group"><label className="form-label">Produto/Serviço</label><input className="form-input" value={form.produto} onChange={e=>setForm({...form,produto:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Valor (R$)</label><input type="number" className="form-input" value={form.valor} onChange={e=>setForm({...form,valor:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Data de Início</label><input type="date" className="form-input" value={form.inicio} onChange={e=>setForm({...form,inicio:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Data de Vencimento</label><input type="date" className="form-input" value={form.venc} onChange={e=>setForm({...form,venc:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Prazo Renovação (dias)</label><input type="number" className="form-input" value={form.renovacao} onChange={e=>setForm({...form,renovacao:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Responsável</label><input className="form-input" value={form.responsavel} onChange={e=>setForm({...form,responsavel:e.target.value})}/></div>
+                <div className="form-group"><label className="form-label">Status</label>
+                  <select className="form-select" value={form.status} onChange={e=>setForm({...form,status:e.target.value})}>
+                    <option>Ativo</option><option>Vencendo</option><option>Vencido</option><option>Cancelado</option>
+                  </select>
+                </div>
+                <div className="form-group" style={{gridColumn:'1/-1'}}><label className="form-label">Observações</label><textarea className="form-textarea" value={form.obs} onChange={e=>setForm({...form,obs:e.target.value})}/></div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(false)}>Cancelar</button>
+              <button className="btn btn-primary" onClick={salvar}>💾 Salvar</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  CALENDÁRIO
+// ══════════════════════════════════════════════
+
+function Calendario({ demands, pmp, contracts }){
+  const months = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const days = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  const today = new Date();
+  const [year, setYear] = useState(today.getFullYear());
+  const [month, setMonth] = useState(today.getMonth());
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const cells = [];
+  for(let i=0; i<firstDay; i++) cells.push({day:0,events:[]});
+  for(let d=1; d<=daysInMonth; d++){
+    const evts = [];
+    if(d===27 && month===3) evts.push({label:'Início OP-001',type:'blue'});
+    if(d===28 && month===3) evts.push({label:'Compra Cobre',type:'orange'});
+    if(d===15 && month===4) evts.push({label:'Entrega D001',type:'green'});
+    if(d===14 && month===3) evts.push({label:'Compra urgente',type:'red'});
+    if(d===1 && month===5) evts.push({label:'Entrega D002',type:'green'});
+    if(d===15 && month===5) evts.push({label:'Contrato C002',type:'orange'});
+    cells.push({day:d, events:evts, isToday: d===today.getDate()&&month===today.getMonth()&&year===today.getFullYear()});
+  }
+
+  return (
+    <div>
+      <div className="cal-header">
+        <div className="cal-nav">
+          <button className="btn btn-secondary btn-sm" onClick={()=>{ if(month===0){setMonth(11);setYear(y=>y-1)}else setMonth(m=>m-1); }}>◀</button>
+          <span className="cal-month">{months[month]} {year}</span>
+          <button className="btn btn-secondary btn-sm" onClick={()=>{ if(month===11){setMonth(0);setYear(y=>y+1)}else setMonth(m=>m+1); }}>▶</button>
+        </div>
+        <div style={{display:'flex',gap:12,fontSize:11,color:'var(--muted)'}}>
+          <span>🔵 Produção</span><span>🟢 Entrega</span><span>🟡 Compra</span><span>🔴 Urgente</span>
+        </div>
+      </div>
+      <div className="cal-days-header">
+        {days.map(d=><div key={d} className="cal-day-name">{d}</div>)}
+      </div>
+      <div className="cal-grid">
+        {cells.map((c,i)=>(
+          <div key={i} className={`cal-cell ${c.isToday?'today':''} ${c.day===0?'other-month':''}`}>
+            {c.day>0 && <>
+              <div className="cal-num">{c.day}</div>
+              {c.events.map((e,j)=><div key={j} className={`cal-ev ${e.type}`}>{e.label}</div>)}
+            </>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  RELATÓRIOS IA
+// ══════════════════════════════════════════════
+
+function RelatoriosIA({ demands, pmp, crp, stock, contracts }){
+  const [loading, setLoading] = useState(false);
+  const [report, setReport] = useState('');
+  const [tipo, setTipo] = useState('executivo');
+  const [lang, setLang] = useState('simples');
+  const [saved, setSaved] = useState([
+    {titulo:'Relatório Executivo — Abr/2025',data:'27/04/2025 09:15',tipo:'Executivo',conteudo:'Relatório salvo em 27/04/2025.\nConsulte o módulo de geração para criar novos relatórios.'},
+    {titulo:'Análise de Gargalos — Sem.17',data:'25/04/2025 08:00',tipo:'CRP',conteudo:'Análise de CRP — Semana 17.\nGargalos identificados em Montagem A.'},
+  ]);
+
+  const crpCalc = crp.map(calcCRP);
+  const stockCalc = stock.map(calcStock);
+  const pmpCalc = pmp.map(calcPMP);
+  const atrasadas = demands.filter(d=>d.status==='Atrasada');
+  const criticos = stockCalc.filter(s=>s.status==='Crítico');
+  const sobrecargas = crpCalc.filter(c=>c.capUtil>100);
+  const vencendo = contracts.filter(c=>['Vencendo','Vencido'].includes(c.status));
+
+  const gerarRelatorio = () => {
+    setLoading(true);
+    setReport('');
+    setTimeout(()=>{
+      const hoje = new Date().toLocaleDateString('pt-BR');
+      let txt = '';
+      if(tipo==='executivo' && lang==='simples'){
+        txt = `📊 RELATÓRIO EXECUTIVO — DE OLHO NO AMANHÃ\n📅 Gerado em: ${hoje}\n\n`;
+        txt += `✅ VISÃO GERAL\n`;
+        txt += `• Total de demandas ativas: ${demands.filter(d=>!['Concluída','Cancelado'].includes(d.status)).length}\n`;
+        txt += `• Produção planejada: ${pmpCalc.reduce((a,p)=>a+p.qtdProd,0)} unidades\n`;
+        txt += `• Contratos ativos: ${contracts.filter(c=>c.status==='Ativo').length}\n\n`;
+        if(atrasadas.length>0){ txt += `⚠️ DEMANDAS ATRASADAS (${atrasadas.length})\n`; atrasadas.forEach(d=>{ txt += `• ${d.id}: ${d.produto} — ${d.qtd} un. — Cliente: ${d.cliente}\n`; }); txt += '\n'; }
+        if(criticos.length>0){ txt += `🔴 ESTOQUE CRÍTICO (${criticos.length} itens)\n`; criticos.forEach(s=>{ txt += `• ${s.produto}: ${s.atual} (segurança: ${s.seg}) — Compra urgente!\n`; }); txt += '\n'; }
+        if(sobrecargas.length>0){ txt += `⚙️ GARGALOS PRODUTIVOS\n`; sobrecargas.forEach(c=>{ txt += `• ${c.ct} (${c.maquina}): ${c.capUtil.toFixed(1)}% — Sobrecarga: ${c.sobrecarga}h\n`; }); txt += '\n'; }
+        if(vencendo.length>0){ txt += `📜 CONTRATOS CRÍTICOS\n`; vencendo.forEach(c=>{ txt += `• ${c.numero} — ${c.empresa} — Vencimento: ${c.venc} (${c.status})\n`; }); txt += '\n'; }
+        txt += `🎯 RECOMENDAÇÕES PRIORITÁRIAS\n`;
+        if(criticos.length>0) txt += `1. Emitir ordens de compra para itens críticos imediatamente.\n`;
+        if(sobrecargas.length>0) txt += `2. Negociar turno extra ou terceirização para centros em sobrecarga.\n`;
+        if(vencendo.length>0) txt += `3. Acionar processo de renovação dos contratos próximos ao vencimento.\n`;
+        if(atrasadas.length>0) txt += `4. Revisar e priorizar demandas atrasadas junto à equipe de produção.\n`;
+      } else if(tipo==='crp'){
+        txt = `📊 RELATÓRIO CRP — CAPACIDADE PRODUTIVA\n📅 Gerado em: ${hoje}\n\n`;
+        crpCalc.forEach(c=>{
+          txt += `[${c.ordem}] ${c.ct} — ${c.produto}\n`;
+          txt += `  Qtd Planejada: ${c.qtdPlan} un. | Tempo Padrão: ${c.tempoPad}h/un\n`;
+          txt += `  Tempo Total: ${c.tempoTotal}h | Capacidade Diária: ${c.capDia}h\n`;
+          txt += `  Capacidade Utilizada: ${c.capUtil.toFixed(2)}% | Status: ${c.status}\n`;
+          if(c.sobrecarga>0) txt += `  ⚠️ SOBRECARGA: ${c.sobrecarga}h acima da capacidade\n`;
+          else txt += `  ✅ Ociosidade disponível: ${c.capOciosa}h\n`;
+          txt += '\n';
+        });
+      } else {
+        txt = `📊 RELATÓRIO ${tipo.toUpperCase()} — LINGUAGEM TÉCNICA\n📅 Gerado em: ${hoje}\n\n`;
+        txt += `PMP CONSOLIDADO:\n`;
+        pmpCalc.forEach(p=>{ txt += `• ${p.id}: ${p.produto} | Período: ${p.periodo} | Qtd: ${p.qtdProd} un. | Status: ${p.status}\n`; });
+        txt += `\nANÁLISE DE ESTOQUE:\n`;
+        stockCalc.forEach(s=>{ txt += `• ${s.produto}: Atual=${s.atual} | Seg.=${s.seg} | Status: ${s.status}\n`; });
+      }
+      setReport(txt);
+      setLoading(false);
+    }, 1600);
+  };
+
+  const salvar = () => {
+    if(!report) return;
+    setSaved([{titulo:`Relatório ${tipo} — ${new Date().toLocaleDateString('pt-BR')}`, data:new Date().toLocaleString('pt-BR'), tipo, conteudo: report}, ...saved]);
+    alert('Relatório salvo no histórico!');
+  };
+
+  const copiar = () => { if(report){ navigator.clipboard.writeText(report); alert('Copiado!'); } };
+
+  const [viewModal, setViewModal] = useState(null);
+
+  function pdfRelatorio(h){
+    const w = window.open('','_blank');
+    w.document.write('<html><body><pre style="font-family:monospace;white-space:pre-wrap;padding:20px;font-size:13px">' + (h.conteudo||h.titulo) + '</pre></body></html>');
+    w.document.close(); w.print();
+  }
+
+  return (
+    <div>
+      <div className="action-bar">
+        <select className="form-select" style={{width:200}} value={tipo} onChange={e=>setTipo(e.target.value)}>
+          <option value="executivo">Relatório Executivo</option>
+          <option value="pmp">Relatório PMP</option>
+          <option value="crp">Relatório CRP</option>
+          <option value="estoque">Estoque Crítico</option>
+          <option value="gargalos">Gargalos</option>
+          <option value="contratos">Contratos</option>
+        </select>
+        <select className="form-select" style={{width:180}} value={lang} onChange={e=>setLang(e.target.value)}>
+          <option value="simples">Linguagem Simples</option>
+          <option value="tecnico">Linguagem Técnica</option>
+        </select>
+        <button className="btn btn-green" onClick={gerarRelatorio} disabled={loading}>
+          {loading ? '⏳ Gerando...' : '🤖 Gerar Relatório com IA'}
+        </button>
+      </div>
+
+      {loading && (
+        <div className="ai-box">
+          <div className="ai-text">⏳ Analisando dados de PMP, MRP, CRP e estoque... Processando indicadores... Gerando insights gerenciais...</div>
+        </div>
+      )}
+
+      {report && (
+        <div className="ai-box" style={{marginBottom:16}}>
+          <div className="ai-header">
+            <span className="ai-icon">🤖</span>
+            <span className="ai-title">Relatório Gerado</span>
+            <div style={{marginLeft:'auto',display:'flex',gap:6,flexWrap:'wrap'}}>
+              <button className="btn btn-secondary btn-sm" onClick={copiar}>📋 Copiar</button>
+              <button className="btn btn-secondary btn-sm" onClick={salvar}>💾 Salvar</button>
+              <button className="btn btn-secondary btn-sm" onClick={()=>window.print()}>🖨️ Imprimir</button>
+            </div>
+          </div>
+          <pre className="report-text">{report}</pre>
+        </div>
+      )}
+
+      <div className="table-wrap">
+        <div className="table-header"><span className="table-title">Histórico de Relatórios ({saved.length})</span></div>
+        <table>
+          <thead><tr><th>Título</th><th>Data/Hora</th><th>Tipo</th><th>Ações</th></tr></thead>
+          <tbody>
+            {saved.map((h,i)=>(
+              <tr key={i}>
+                <td style={{fontWeight:600}}>{h.titulo}</td>
+                <td style={{fontFamily:'var(--mono)',fontSize:11}}>{h.data}</td>
+                <td><span className="badge b-blue">{h.tipo}</span></td>
+                <td style={{display:'flex',gap:4}}>
+                  <button className="btn btn-secondary btn-sm" onClick={()=>setViewModal(h)}>👁️ Ver</button>
+                  <button className="btn btn-secondary btn-sm" onClick={()=>pdfRelatorio(h)}>📄 PDF</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {viewModal && (
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:700}}>
+            <div className="modal-header">
+              <span className="modal-title">📄 {viewModal.titulo}</span>
+              <button className="btn btn-secondary btn-sm" onClick={()=>setViewModal(null)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <pre className="report-text">{viewModal.conteudo || '(Conteúdo não disponível)'}</pre>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setViewModal(null)}>Fechar</button>
+              <button className="btn btn-primary" onClick={()=>pdfRelatorio(viewModal)}>📄 Imprimir PDF</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  CONFIGURAÇÕES
+// ══════════════════════════════════════════════
+
+function Configuracoes(){
+  return (
+    <div>
+      <div className="ai-box">
+        <div className="ai-text">⚙️ <strong>Configurações do sistema.</strong> Gerencie usuários, permissões, centros de trabalho, máquinas e parâmetros do ERP.</div>
+      </div>
+      <div className="chart-grid">
+        {[['👤 Usuários','Gerenciar contas e perfis de acesso'],['🔐 Permissões (RBAC)','Administrador, Gerente, Analista, Almoxarifado, Compras, Operador'],['⚙️ Centros de Trabalho','Cadastrar e configurar centros produtivos'],['🤖 IA e Relatórios','Configurar modelos e templates de relatórios'],['📅 Calendário Produtivo','Feriados, turnos e jornadas de trabalho'],['🔔 Notificações','Alertas de estoque, prazo e capacidade']].map(([t,d])=>(
+          <div key={t} className="chart-box" style={{cursor:'pointer'}}>
+            <div style={{fontSize:18,marginBottom:8}}>{t.split(' ')[0]}</div>
+            <div style={{fontSize:13,fontWeight:700,color:'var(--white)',marginBottom:4}}>{t.slice(3)}</div>
+            <div style={{fontSize:11,color:'var(--muted)',lineHeight:1.5}}>{d}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ══════════════════════════════════════════════
+//  APP PRINCIPAL
+// ══════════════════════════════════════════════
+
+const navItems = [
+  {id:'dashboard',icon:'📊',label:'Dashboard',section:'Principal'},
+  {id:'produtos',icon:'📦',label:'Produtos',section:'Produção'},
+  {id:'demandas',icon:'📋',label:'Demandas',section:'Produção'},
+  {id:'bom',icon:'🔧',label:'BOM',section:'Produção'},
+  {id:'pmp',icon:'📅',label:'PMP',section:'Produção'},
+  {id:'mrp',icon:'🔄',label:'MRP',section:'Produção'},
+  {id:'crp',icon:'⚙️',label:'CRP',section:'Produção'},
+  {id:'estoque',icon:'🏭',label:'Estoque',section:'Gestão'},
+  {id:'contratos',icon:'📜',label:'Contratos',section:'Gestão'},
+  {id:'calendario',icon:'🗓️',label:'Calendário',section:'Gestão'},
+  {id:'ia',icon:'🤖',label:'Relatórios IA',section:'Gestão'},
+  {id:'config',icon:'⚙️',label:'Configurações',section:'Sistema'},
+];
+
+function App(){
+  const [active, setActive] = useState('dashboard');
+  const [products, setProducts] = useState(initProducts);
+  const [demands, setDemands] = useState(initDemands);
+  const [contracts, setContracts] = useState(initContracts);
+  const [bom] = useState(initBOM);
+  const [pmp] = useState(initPMP);
+  const [crp] = useState(initCRP);
+  const [stock] = useState(initStock);
+
+  const titles = {
+    dashboard:'Dashboard Principal', produtos:'Cadastro de Produtos', demandas:'Gestão de Demandas',
+    bom:'BOM — Estrutura do Produto', pmp:'Plano Mestre de Produção (PMP)',
+    mrp:'MRP — Necessidade de Materiais', crp:'CRP — Capacidade Produtiva',
+    estoque:'Controle de Estoque', contratos:'Gestão de Contratos',
+    calendario:'Calendário Produtivo', ia:'Relatórios com Inteligência Artificial',
+    config:'Configurações do Sistema',
+  };
+
+  const sections = [...new Set(navItems.map(n=>n.section))];
+
+  const renderContent = () => {
+    const props = { products, setProducts, demands, setDemands, contracts, setContracts, bom, pmp, crp, stock };
+    switch(active){
+      case 'dashboard': return <Dashboard {...props}/>;
+      case 'produtos': return <Produtos {...props}/>;
+      case 'demandas': return <Demandas {...props}/>;
+      case 'bom': return <BOM {...props}/>;
+      case 'pmp': return <PMP {...props}/>;
+      case 'mrp': return <MRP {...props}/>;
+      case 'crp': return <CRP {...props}/>;
+      case 'estoque': return <Estoque {...props}/>;
+      case 'contratos': return <Contratos {...props}/>;
+      case 'calendario': return <Calendario {...props}/>;
+      case 'ia': return <RelatoriosIA {...props}/>;
+      case 'config': return <Configuracoes/>;
+      default: return <Dashboard {...props}/>;
+    }
+  };
+
+  const alertCount = demands.filter(d=>d.status==='Atrasada').length + stock.map(calcStock).filter(s=>s.status==='Crítico').length;
+
+  return (
+    <div className="app">
+      <div className="sidebar">
+        <div className="logo-area">
+          <div className="logo-icon">👁️</div>
+          <div className="logo-name">De Olho no Amanhã</div>
+          <div className="logo-sub">ERP · PCP · v1.0</div>
+        </div>
+        <nav className="nav">
+          {sections.map(section => (
+            <div key={section}>
+              <div className="nav-section">{section}</div>
+              {navItems.filter(n=>n.section===section).map(n=>(
+                <div key={n.id} className={`nav-item ${active===n.id?'active':''}`} onClick={()=>setActive(n.id)}>
+                  <span className="nav-icon">{n.icon}</span>
+                  {n.label}
+                </div>
+              ))}
+            </div>
+          ))}
+        </nav>
+        <div className="sidebar-footer">
+          <div className="user-name">👤 Administrador</div>
+          <div className="user-role">Analista de PCP</div>
+          <div className="online-dot"><div className="dot"/><span>Sistema Online</span></div>
+        </div>
+      </div>
+
+      <div className="main">
+        <div className="header">
+          <div className="header-title">{titles[active]}</div>
+          <span className="header-badge">PCP ATIVO</span>
+          {alertCount > 0 && (
+            <div style={{background:'rgba(239,68,68,.12)',border:'1px solid rgba(239,68,68,.3)',color:'var(--red)',padding:'3px 10px',borderRadius:20,fontSize:10,fontWeight:700}}>
+              🔴 {alertCount} alertas
+            </div>
+          )}
+          <select style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:8,padding:'5px 10px',fontSize:11,color:'var(--white)',fontFamily:'var(--font)'}}>
+            <option>Todos os períodos</option><option>Abr/2025</option><option>Mai/2025</option><option>Jun/2025</option>
+          </select>
+          <button className="btn btn-green btn-sm" onClick={()=>setActive('ia')}>🤖 Gerar IA</button>
+        </div>
+        <div className="content">
+          {renderContent()}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
